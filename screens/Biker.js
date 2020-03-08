@@ -9,17 +9,19 @@ import {
 import {Button} from 'native-base';
 import RNLocation from 'react-native-location';
 
-//import { addLocation, getLocations } from '../api/LocationsApi'
 import firebase from '../database/firebaseDb'
 
 export default class Biker extends React.Component {
   state = {
-    transmitting: false,
+    buttonText: "Start Sending Location",
+    sendingLocation: false,
     lat: null,
     lng: null,
     speed: 0,
     course: null,
-    geolocationDisp: null,
+    documentId: null,
+    lastSentLat: null,
+    lastSentLng: null,
   }
   
   onLocationsReceived = locationList => {
@@ -34,7 +36,6 @@ export default class Biker extends React.Component {
       timeout: 10000,
       maxAge: 60*60
     }
-    this.setState({ready: false, error: null})
     
     RNLocation.configure({
       distanceFilter: 0
@@ -48,15 +49,14 @@ export default class Biker extends React.Component {
     }).then(granted => {
       if (granted) {
         console.log('granted')
-        RNLocation.getLatestLocation({ timeout: 60000 })
-        .then(location => {
+        this.locationSubscription = RNLocation.subscribeToLocationUpdates(locations => {
           console.log('location')
-          console.log(location)
+          console.log(locations)
           this.setState({
-            speed: location.speed,
-            course: location.course,
-            lat: location.latitude,
-            lng: location.longitude
+            speed: locations[0].speed,
+            course: locations[0].course,
+            lat: locations[0].latitude,
+            lng: locations[0].longitude
           }, )//this.mergeCoords)
         })
       } else {
@@ -84,38 +84,46 @@ export default class Biker extends React.Component {
   }
 
   onSendLocation = () => {
-    console.log('start sending location')
-    dbRef = firebase.firestore().collection('Locations');
-    dbRef.add({
-      lat: this.state.lat,
-      lng: this.state.lng,
-    }).then((res) => {
-      console.log('sent data');
-    })
-    this.setState({geolocationDisp: 
-      <Text style={styles.buttonText} >
-        speed: { this.state.speed }{"\n"}
-        course: { this.state.course }{"\n"}
-        latitude: { this.state.lat }{"\n"}
-        longitude: { this.state.lng }{"\n"}
-      </Text>
-    })
-    /*addLocation({
-      lat: this.state.lat,
-      lng: this.state.lng,
-    })*/
+    if (!this.state.sendingLocation) {
+      this.setState({buttonText: "Stop Sending Location"})
+    } else {
+      this.setState({buttonText: "Start Sending Location"})
+    }
+
+    if (
+      this.state.lastSentLat != this.state.lat &&
+      this.state.lastSentLng != this.state.lng
+    ) {
+      console.log('sending location')
+      dbRef = firebase.firestore().collection('Locations');
+
+      dbRef.add({
+        lat: this.state.lat,
+        lng: this.state.lng,
+      }).then((res) => {
+        console.log('sent data to '+res.id);
+        this.setState({documentId: res.id});
+      })
+      this.setState({
+        lastSentLat: this.state.lat,
+        lastSentLng: this.state.lng,
+      })
+    } else {
+      console.log("not sending")
+    }
+    this.setState({sendingLocation: !this.state.sendingLocation})
   }
 
   render() {
     return(
         <View style={styles.screen}>
           <Button
-            full 
+            full
+            success={this.state.sendingLocation} 
             style={styles.buttonText} 
             onPress={() => this.onSendLocation()}>
-            <Text>Start Sending Location</Text>
+            <Text>{ this.state.buttonText }</Text>
           </Button> 
-         { this.state.geolocationDisp }
         </View>
     );
   }

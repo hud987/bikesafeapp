@@ -7,12 +7,12 @@ import {
   StyleSheet,
   TextInput,
 } from "react-native";
-import { Button} from 'native-base';
-import MapView, { PROVIDER_GOOGLE } from 'react-native-maps';
+import { Button } from 'native-base';
+import MapView, { Marker, PROVIDER_GOOGLE } from 'react-native-maps';
 import RNLocation from 'react-native-location';
-//import Geolocation from 'react-native-geolocation-service';
+
 import Polyline from '@mapbox/polyline'
-//import { GooglePlacesAutocomplete } from 'react-native-google-places-autocomplete';
+import firebase from '../database/firebaseDb'
 
 export default class BikerOrDriver extends React.Component {
   state = {
@@ -62,6 +62,9 @@ export default class BikerOrDriver extends React.Component {
         })
       }
     })  
+
+    dbRef = firebase.firestore().collection('Locations');
+    //firebase.firestore().collection('Locations').where("lat","<",this.state.lat+.1,"and",)
   }
 
   geoSuccess = (position) => {
@@ -196,6 +199,13 @@ export default class BikerOrDriver extends React.Component {
             longitudeDelta: 0.0221,
           }}
         >
+          <Marker
+            coordinate = {{
+              latitude: 40.4267, 
+              longitude: -86.9242
+            }}
+            pinColor = {"orange"}
+          />
           <MapView.Polyline 
             strokeWidth = {2}
             strokeColor = {'red'}
