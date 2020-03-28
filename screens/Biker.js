@@ -10,6 +10,7 @@ import {Button} from 'native-base';
 import RNLocation from 'react-native-location';
 
 import firebase from '../database/firebaseDb'
+import { GeoFirestore } from 'geofirestore';
 
 export default class Biker extends React.Component {
   state = {
@@ -95,15 +96,26 @@ export default class Biker extends React.Component {
       this.state.lastSentLng != this.state.lng
     ) {
       console.log('sending location')
-      dbRef = firebase.firestore().collection('Locations');
 
+      var firebaseRef = firebase.firestore();
+      const geofirestore = new GeoFirestore(firebaseRef);
+      const geocollection = geofirestore.collection('Locations');
+      geocollection.add({
+        //speed: 100,
+        //heading: 100,
+        coordinates: new firebase.firestore.GeoPoint(this.state.lat, this.state.lng)
+      }).then((res) => {
+        console.log('sent data to '+res.id);
+        this.setState({documentId: res.id});
+      })
+      /*dbRef = firebase.firestore().collection('Locations');
       dbRef.add({
         lat: this.state.lat,
         lng: this.state.lng,
       }).then((res) => {
         console.log('sent data to '+res.id);
         this.setState({documentId: res.id});
-      })
+      })*/
       this.setState({
         lastSentLat: this.state.lat,
         lastSentLng: this.state.lng,

@@ -13,12 +13,13 @@ import RNLocation from 'react-native-location';
 
 import Polyline from '@mapbox/polyline'
 import firebase from '../database/firebaseDb'
+import { GeoFirestore } from 'geofirestore';
 
 export default class BikerOrDriver extends React.Component {
   state = {
     ready: false,
-    lat: 40.4237, //null, 37.78825
-    lng: -86.9212, //null, -122.4324
+    lat: 40.4241, //null, 37.78825
+    lng: -86.9217, //null, -122.4324
     speed: 0,
     heading: 0,
     error: null,
@@ -27,6 +28,7 @@ export default class BikerOrDriver extends React.Component {
     desPlace_Id: null,
     destination: "",
     predictions: [],
+    markers: [],
   }
 
   componentWillUnmount() {
@@ -39,6 +41,8 @@ export default class BikerOrDriver extends React.Component {
       timeout: 10000,
       maxAge: 60*60
     }
+    var currLat = this.state.lat
+    var currLng = this.state.lng
     this.setState({ready: false, error: null})
     
     RNLocation.configure({
@@ -55,6 +59,8 @@ export default class BikerOrDriver extends React.Component {
           this.locationSubscription = RNLocation.subscribeToLocationUpdates(locations => {
             console.log('location')
             console.log(locations)
+            currLat = locations[0].latitude
+            currLng = locations[0].longitude
             this.setState({
               lat: locations[0].latitude,
               lng: locations[0].longitude
@@ -63,8 +69,39 @@ export default class BikerOrDriver extends React.Component {
       }
     })  
 
-    dbRef = firebase.firestore().collection('Locations');
-    //firebase.firestore().collection('Locations').where("lat","<",this.state.lat+.1,"and",)
+    //dbRef = firebase.firestore().collection('Locations');
+    var firebaseRef = firebase.firestore();
+
+    const geofirestore = new GeoFirestore(firebaseRef);
+    const geocollection = geofirestore.collection('Locations');
+
+    const query = geocollection.near({ 
+      center: new firebase.firestore.GeoPoint(this.state.lat,this.state.lng),//currLat, currLng), 
+      radius: .041//.2230258222650538385556373555118625517
+    });
+    var pulledMarkers = [];
+    query.get().then((value) => {
+      // All GeoDocument returned by GeoQuery, like the GeoDocument added above
+      value.forEach(e => {
+        const lat = e.data().coordinates.U;
+        const lng = e.data().coordinates.k;
+        pulledMarkers.push(
+          <Marker
+            key={(lat + lng).toString()}
+            coordinate = {{
+              latitude: lat, 
+              longitude: lng
+            }}
+            pinColor = {"orange"}
+          />
+        )
+      })
+      console.log(pulledMarkers)
+      this.setState({markers: pulledMarkers})
+      value.docChanges(e => {
+        console.log("change: " + e);
+      })
+    });
   }
 
   geoSuccess = (position) => {
@@ -83,11 +120,6 @@ export default class BikerOrDriver extends React.Component {
   }
 
   mergeCoords = () => {
-    console.log('merging coords')
-    console.log('lat')
-    console.log(this.state.lat)
-    console.log('lng')
-    console.log(this.state.lng)
     lat = this.state.lat
     lng = this.state.lng
     desLat = this.state.desLat
@@ -185,32 +217,34 @@ export default class BikerOrDriver extends React.Component {
         </Text>
         )}
     });
-
     return(
       <View style={styles.screen}>
         <MapView
           showsUserLocation
           provider={PROVIDER_GOOGLE}
           style={styles.screen}
-          initialRegion={{
-            latitude: 40.4237,
-            longitude: -86.9212,
-            latitudeDelta: 0.0522,
-            longitudeDelta: 0.0221,
+          region={{
+            latitude: this.state.lat,//40.4237,
+            longitude: this.state.lng,//-86.9212,
+            latitudeDelta: 0.003,
+            longitudeDelta: 0.003,
           }}
         >
-          <Marker
-            coordinate = {{
-              latitude: 40.4267, 
-              longitude: -86.9242
-            }}
-            pinColor = {"orange"}
-          />
+          { this.state.markers }
           <MapView.Polyline 
             strokeWidth = {2}
             strokeColor = {'red'}
             coordinates = {this.state.coords}
           />
+          <MapView.Circle
+                key = { (this.state.lat + this.state.lng).toString() }
+                center = {{latitude: this.state.lat, longitude: this.state.lng}}
+                radius = { 35 }
+                strokeWidth = { 2 }
+                strokeColor = { 'black' }
+                fillColor = { 'rgba(230,238,255,0.5)' }
+                //onRegionChangeComplete = { this.onRegionChangeComplete.bind(this) }
+        />
         </MapView>
         <View style={styles.mapInput}>
           <TextInput style={styles.destinationInput}placeholder="Enter destination..." value={this.state.destination} onChangeText={destination => this.onChangeDestination(destination)} />
