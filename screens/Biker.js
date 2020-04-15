@@ -29,6 +29,12 @@ export default class Biker extends React.Component {
     console.log(locationList)
   };
 
+  componentWillUnmount() {
+    if (this.locationSubscription) {
+      this.locationSubscription();
+    }
+  }
+
   componentDidMount() {
     //getLocations(onLocationsReceived);
 
@@ -77,6 +83,14 @@ export default class Biker extends React.Component {
                   lat: locations[0].latitude,
                   lng: locations[0].longitude
                 }, )//this.mergeCoords)
+                if (this.state.documentId != null && this.state.sendingLocation == true) {
+                  console.log('updating data')
+                  geocollection.doc(this.state.documentId).update({
+                    'coordinates': new firebase.firestore.GeoPoint(this.state.lat, this.state.lng)
+                  }).then((res) => {
+                    console.log('updated data at '+res.id);
+                  })
+                }
               })
             }
           })
@@ -85,43 +99,37 @@ export default class Biker extends React.Component {
   }
 
   onSendLocation = () => {
-    if (!this.state.sendingLocation) {
-      this.setState({buttonText: "Stop Sending Location"})
-    } else {
+    if (this.state.sendingLocation) {
       this.setState({buttonText: "Start Sending Location"})
-    }
-
-    if (
-      this.state.lastSentLat != this.state.lat &&
-      this.state.lastSentLng != this.state.lng
-    ) {
-      console.log('sending location')
-
-      var firebaseRef = firebase.firestore();
-      const geofirestore = new GeoFirestore(firebaseRef);
-      const geocollection = geofirestore.collection('Locations');
-      geocollection.add({
-        //speed: 100,
-        //heading: 100,
-        coordinates: new firebase.firestore.GeoPoint(this.state.lat, this.state.lng)
-      }).then((res) => {
-        console.log('sent data to '+res.id);
-        this.setState({documentId: res.id});
-      })
-      /*dbRef = firebase.firestore().collection('Locations');
-      dbRef.add({
-        lat: this.state.lat,
-        lng: this.state.lng,
-      }).then((res) => {
-        console.log('sent data to '+res.id);
-        this.setState({documentId: res.id});
-      })*/
-      this.setState({
-        lastSentLat: this.state.lat,
-        lastSentLng: this.state.lng,
-      })
     } else {
-      console.log("not sending")
+      this.setState({buttonText: "Stop Sending Location"})
+
+      if (
+        this.state.lastSentLat != this.state.lat &&
+        this.state.lastSentLng != this.state.lng
+      ) {
+        var firebaseRef = firebase.firestore();
+        const geofirestore = new GeoFirestore(firebaseRef);
+        const geocollection = geofirestore.collection('Locations');
+
+        if (this.state.documentId == null) {
+          console.log('sending data')
+          geocollection.add({
+            //speed: 100,
+            //heading: 100,
+            coordinates: new firebase.firestore.GeoPoint(this.state.lat, this.state.lng)
+          }).then((res) => {
+            console.log('sent data to '+res.id);
+            this.setState({documentId: res.id});
+          })
+        } 
+        this.setState({
+          lastSentLat: this.state.lat,
+          lastSentLng: this.state.lng,
+        })
+      } else {
+        console.log("not sending")
+      }
     }
     this.setState({sendingLocation: !this.state.sendingLocation})
   }

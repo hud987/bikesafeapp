@@ -18,8 +18,8 @@ import { GeoFirestore } from 'geofirestore';
 export default class BikerOrDriver extends React.Component {
   state = {
     ready: false,
-    lat: 40.4241, //null, 37.78825
-    lng: -86.9217, //null, -122.4324
+    lat: 40.4241, //null, 
+    lng: -86.9217, //null,
     speed: 0,
     heading: 0,
     error: null,
@@ -32,7 +32,9 @@ export default class BikerOrDriver extends React.Component {
   }
 
   componentWillUnmount() {
-    this.locationSubscription();
+    if (this.locationSubscription) {
+      this.locationSubscription();
+    }
   }
 
   componentDidMount() {
@@ -41,43 +43,74 @@ export default class BikerOrDriver extends React.Component {
       timeout: 10000,
       maxAge: 60*60
     }
-    var currLat = this.state.lat
-    var currLng = this.state.lng
+    var currLat
+    var currLng
     this.setState({ready: false, error: null})
     
     RNLocation.configure({
       distanceFilter: 0
     })
-    console.log('did mount')
-    RNLocation.requestPermission({
-      ios: "whenInUse",
+    RNLocation.checkPermission({
+      ios: 'whenInUse', // or 'always'
       android: {
-        detail: "coarse"
+        detail: 'coarse' // or 'fine'
       }
     }).then(granted => {
-        if (granted) {
-          this.locationSubscription = RNLocation.subscribeToLocationUpdates(locations => {
-            console.log('location')
-            console.log(locations)
-            currLat = locations[0].latitude
-            currLng = locations[0].longitude
-            this.setState({
-              lat: locations[0].latitude,
-              lng: locations[0].longitude
-            }, )//this.mergeCoords)
+      if (granted) {
+        console.log('granted')
+        this.locationSubscription = RNLocation.subscribeToLocationUpdates(locations => {
+          console.log('location sub: ' + locations[0].latitude + ' ' + locations[0].longitude)
+          currLat = locations[0].latitude
+          currLng = locations[0].longitude
+          this.getBicyclistsWithinRadius(currLat,currLng)
+          this.setState({
+            //speed: locations[0].speed,
+            //course: locations[0].course,
+            lat: locations[0].latitude,
+            lng: locations[0].longitude
+          }, )//this.mergeCoords)
         })
-      }
-    })  
+        //console.log('currLat: ' + currLat)
+        
+      } else {
+          RNLocation.requestPermission({
+            ios: "whenInUse",
+            android: {
+              detail: "coarse"
+            }
+          }).then(granted => {
+              if (granted) {
+                this.locationSubscription = RNLocation.subscribeToLocationUpdates(locations => {
+                  console.log('location')
+                  console.log(locations)
+                  currLat = locations[0].latitude
+                  currLng = locations[0].longitude
+                  console.log('new lat: ' + locations[0].latitude)
+                  console.log('new lng: ' + locations[0].longitude)
+                  this.setState({
+                    //speed: locations[0].speed,
+                    //course: locations[0].course,
+                    lat: locations[0].latitude,
+                    lng: locations[0].longitude
+                  }, )//this.mergeCoords)
+              })
+            }
+          })  
+        }
+      })
+
 
     //dbRef = firebase.firestore().collection('Locations');
-    var firebaseRef = firebase.firestore();
+  }
 
+  getBicyclistsWithinRadius = (currLat,currLng) => {
+    var firebaseRef = firebase.firestore();
     const geofirestore = new GeoFirestore(firebaseRef);
     const geocollection = geofirestore.collection('Locations');
-
+    console.log('showing markers around ' + currLat + ' , ' + currLng)
     const query = geocollection.near({ 
-      center: new firebase.firestore.GeoPoint(this.state.lat,this.state.lng),//currLat, currLng), 
-      radius: .041//.2230258222650538385556373555118625517
+      center: new firebase.firestore.GeoPoint(currLat,currLng), 
+      radius: .038//.2230258222650538385556373555118625517
     });
     var pulledMarkers = [];
     query.get().then((value) => {
@@ -204,7 +237,8 @@ export default class BikerOrDriver extends React.Component {
   }
 
   render() {
-    
+    //console.log(this.state.lat)
+    //console.log(this.state.lng)
     const predictions = this.state.predictions.map(prediction => {
       if (this.state.destination != prediction.description) {
         return (
