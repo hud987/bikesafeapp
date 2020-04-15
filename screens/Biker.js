@@ -55,17 +55,7 @@ export default class Biker extends React.Component {
       }
     }).then(granted => {
       if (granted) {
-        console.log('granted')
-        this.locationSubscription = RNLocation.subscribeToLocationUpdates(locations => {
-          console.log('location')
-          console.log(locations)
-          this.setState({
-            speed: locations[0].speed,
-            course: locations[0].course,
-            lat: locations[0].latitude,
-            lng: locations[0].longitude
-          }, )//this.mergeCoords)
-        })
+        this.startLocationSubscription()
       } else {
         RNLocation.requestPermission({
           ios: "whenInUse",
@@ -74,28 +64,34 @@ export default class Biker extends React.Component {
           }
         }).then(granted => {
             if (granted) {
-              this.locationSubscription = RNLocation.subscribeToLocationUpdates(locations => {
-                console.log('location')
-                console.log(locations)
-                this.setState({
-                  speed: locations[0].speed,
-                  course: locations[0].course,
-                  lat: locations[0].latitude,
-                  lng: locations[0].longitude
-                }, )//this.mergeCoords)
-                if (this.state.documentId != null && this.state.sendingLocation == true) {
-                  console.log('updating data')
-                  geocollection.doc(this.state.documentId).update({
-                    'coordinates': new firebase.firestore.GeoPoint(this.state.lat, this.state.lng)
-                  }).then((res) => {
-                    console.log('updated data at '+res.id);
-                  })
-                }
-              })
+              this.startLocationSubscription()
             }
           })
         }
     })  
+  }
+
+  startLocationSubscription = () => {
+    this.locationSubscription = RNLocation.subscribeToLocationUpdates(locations => {
+      console.log('location')
+      console.log(locations)
+      this.setState({
+        speed: locations[0].speed,
+        course: locations[0].course,
+        lat: locations[0].latitude,
+        lng: locations[0].longitude
+      }, )//this.mergeCoords)
+
+      var firebaseRef = firebase.firestore();
+      const geofirestore = new GeoFirestore(firebaseRef);
+      const geocollection = geofirestore.collection('Locations');
+      if (this.state.documentId != null && this.state.sendingLocation == true) {
+        console.log('updating data')
+        geocollection.doc(this.state.documentId).update({
+          'coordinates': new firebase.firestore.GeoPoint(this.state.lat, this.state.lng)
+        })
+      }
+    })
   }
 
   onSendLocation = () => {

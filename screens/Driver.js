@@ -29,6 +29,7 @@ export default class BikerOrDriver extends React.Component {
     destination: "",
     predictions: [],
     markers: [],
+    directionLine: null,
   }
 
   componentWillUnmount() {
@@ -57,21 +58,7 @@ export default class BikerOrDriver extends React.Component {
       }
     }).then(granted => {
       if (granted) {
-        console.log('granted')
-        this.locationSubscription = RNLocation.subscribeToLocationUpdates(locations => {
-          console.log('location sub: ' + locations[0].latitude + ' ' + locations[0].longitude)
-          currLat = locations[0].latitude
-          currLng = locations[0].longitude
-          this.getBicyclistsWithinRadius(currLat,currLng)
-          this.setState({
-            //speed: locations[0].speed,
-            //course: locations[0].course,
-            lat: locations[0].latitude,
-            lng: locations[0].longitude
-          }, )//this.mergeCoords)
-        })
-        //console.log('currLat: ' + currLat)
-        
+        this.startLocationSubscription()
       } else {
           RNLocation.requestPermission({
             ios: "whenInUse",
@@ -79,48 +66,56 @@ export default class BikerOrDriver extends React.Component {
               detail: "coarse"
             }
           }).then(granted => {
-              if (granted) {
-                this.locationSubscription = RNLocation.subscribeToLocationUpdates(locations => {
-                  console.log('location')
-                  console.log(locations)
-                  currLat = locations[0].latitude
-                  currLng = locations[0].longitude
-                  console.log('new lat: ' + locations[0].latitude)
-                  console.log('new lng: ' + locations[0].longitude)
-                  this.setState({
-                    //speed: locations[0].speed,
-                    //course: locations[0].course,
-                    lat: locations[0].latitude,
-                    lng: locations[0].longitude
-                  }, )//this.mergeCoords)
-              })
+            if (granted) {
+              this.startLocationSubscription() 
             }
           })  
         }
       })
+  }
 
-
-    //dbRef = firebase.firestore().collection('Locations');
+  startLocationSubscription = () => {
+    this.locationSubscription = RNLocation.subscribeToLocationUpdates(locations => {
+      var currLat = locations[0].latitude
+      var currLng = locations[0].longitude
+      console.log('course: ' + locations[0].course )
+      console.log('speed: ' + locations[0].speed )
+      this.getBicyclistsWithinRadius(currLat,currLng)
+      this.setState({
+        speed: locations[0].speed,
+        course: locations[0].course,
+        lat: locations[0].latitude,
+        lng: locations[0].longitude
+      }, )
+    })
   }
 
   getBicyclistsWithinRadius = (currLat,currLng) => {
+    var filterRadius = .036
+    var forwardLat = currLat
+    var forwardLng = currLng
+    if (this.state.speed >-1 && this.state.course > -1) {
+      filterRadius *= 1 + (this.state.speed/10.0)
+      forwardLat += this.state.speed * .00004 * Math.cos(this.state.course * 3.14/180.0)
+      forwardLng += this.state.speed * .00004 * Math.sin(this.state.course * 3.14/180.0)
+    }
+
     var firebaseRef = firebase.firestore();
     const geofirestore = new GeoFirestore(firebaseRef);
     const geocollection = geofirestore.collection('Locations');
-    console.log('showing markers around ' + currLat + ' , ' + currLng)
     const query = geocollection.near({ 
-      center: new firebase.firestore.GeoPoint(currLat,currLng), 
-      radius: .038//.2230258222650538385556373555118625517
+      center: new firebase.firestore.GeoPoint(forwardLat,forwardLng), 
+      radius: filterRadius//.2230258222650538385556373555118625517
     });
-    var pulledMarkers = [];
-    query.get().then((value) => {
-      // All GeoDocument returned by GeoQuery, like the GeoDocument added above
-      value.forEach(e => {
+    
+    query.onSnapshot((value) => {
+      var pulledMarkers = [];
+      value.forEach((e,i) => {
         const lat = e.data().coordinates.U;
         const lng = e.data().coordinates.k;
         pulledMarkers.push(
           <Marker
-            key={(lat + lng).toString()}
+            key={(i).toString()}
             coordinate = {{
               latitude: lat, 
               longitude: lng
@@ -129,11 +124,8 @@ export default class BikerOrDriver extends React.Component {
           />
         )
       })
-      console.log(pulledMarkers)
+      console.log('onSnapshot')
       this.setState({markers: pulledMarkers})
-      value.docChanges(e => {
-        console.log("change: " + e);
-      })
     });
   }
 
@@ -152,32 +144,15 @@ export default class BikerOrDriver extends React.Component {
     this.setState({error: err.message})
   }
 
-  mergeCoords = () => {
-    lat = this.state.lat
-    lng = this.state.lng
-    desLat = this.state.desLat
-    desLng = this.state.desLng
-
-    const hasStartAndEnd = lat != null && desLat != null
-    if (hasStartAndEnd) {
-      const concatStart = `${lat},${lng}`
-      const concatEnd = `${desLat},${desLng}`
-      this.getDirections(concatStart, concatEnd)
-    }
-  }
-
   async getDirections() {
     console.log('get directions')
-    if (this.state.desPlace_Id==null) {
-      console.log('enter a dest')
+    if (this.state.desPlace_Id==null || this.state.destination=='') {
+      this.setState({ directionLine: null })
       return
     }
     try {
       const resp = await fetch(`https://maps.googleapis.com/maps/api/place/details/json?place_id=${this.state.desPlace_Id}&fields=geometry&key=AIzaSyAQ6JZnM-5sMY9Za63OUKE2fNvRQy_h9CY`)
       const json = await resp.json()
-      console.log('current coords');
-      console.log(this.state.lat);
-      console.log(this.state.lng);
       this.getDirectionsTwo(`${this.state.lat}, ${this.state.lng}`,`${json.result.geometry.location.lat}, ${json.result.geometry.location.lng}`)
       this.setState({
         desLat: json.result.geometry.location.lat,
@@ -189,13 +164,11 @@ export default class BikerOrDriver extends React.Component {
   }
 
   async getDirectionsTwo(startLoc, desLoc) {
-    console.log('getting directions')
     const apiKey = "AIzaSyAQ6JZnM-5sMY9Za63OUKE2fNvRQy_h9CY";
     const apiUrl = `https://maps.googleapis.com/maps/api/directions/json?origin=${startLoc}&destination=${desLoc}&key=${apiKey}`;
     
     try {
       const resp = await fetch(apiUrl)
-      console.log('resp')
       const respJson = await resp.json()
       const points = Polyline.decode(respJson.routes[0].overview_polyline.points)
       const coords = points.map(point => {
@@ -205,7 +178,12 @@ export default class BikerOrDriver extends React.Component {
         }
       })
       
-      this.setState({ coords })
+      this.setState({ directionLine:           
+        <MapView.Polyline 
+          strokeWidth = {2}
+          strokeColor = {'red'}
+          coordinates = {coords}
+        /> })
     } catch(error) {
       console.log('error: ' + error)
     }
@@ -218,7 +196,6 @@ export default class BikerOrDriver extends React.Component {
     try {
       const result = await fetch(apiUrl);
       const json = await result.json();
-      //console.log(json);
       this.setState({
         predictions: json.predictions
       })
@@ -228,7 +205,6 @@ export default class BikerOrDriver extends React.Component {
   }
 
   onSetDestination = prediction => {
-    console.log(prediction.place_id)
     this.setState({ 
       destination: prediction.description,
       desPlace_Id: prediction.place_id,
@@ -237,8 +213,22 @@ export default class BikerOrDriver extends React.Component {
   }
 
   render() {
-    //console.log(this.state.lat)
-    //console.log(this.state.lng)
+    //speed maxes at 30
+    //course is between 1-360, 0 is straight up
+    var forwardLat = this.state.lat //37.33180957
+    var forwardLng = this.state.lng //-122.03053391
+    var angle
+    var filterCircleRadius = 35
+    var filterCircleCenter = {latitude: this.state.lat, longitude: this.state.lng}
+    if (this.state.speed > 0 && this.state.course > -1) {
+      filterCircleRadius *= 1 + (this.state.speed/10.0)
+
+      forwardLat = this.state.lat + this.state.speed * .00004 * Math.cos(this.state.course * 3.14/180.0)
+      forwardLng = this.state.lng + this.state.speed * .00004 * Math.sin(this.state.course * 3.14/180.0)
+      filterCircleCenter = {latitude: forwardLat, longitude: forwardLng}
+    }
+    console.log(filterCircleRadius)
+
     const predictions = this.state.predictions.map(prediction => {
       if (this.state.destination != prediction.description) {
         return (
@@ -265,19 +255,22 @@ export default class BikerOrDriver extends React.Component {
           }}
         >
           { this.state.markers }
+          { this.state.directionLine }
           <MapView.Polyline 
             strokeWidth = {2}
-            strokeColor = {'red'}
-            coordinates = {this.state.coords}
-          />
+            strokeColor = {'black'}
+            coordinates = {[
+              {"latitude":this.state.lat, "longitude":this.state.lng},
+              {"latitude": forwardLat, "longitude": forwardLng}
+            ]}
+          /> 
           <MapView.Circle
                 key = { (this.state.lat + this.state.lng).toString() }
-                center = {{latitude: this.state.lat, longitude: this.state.lng}}
-                radius = { 35 }
+                center = { filterCircleCenter }//{{latitude: this.state.lat, longitude: this.state.lng}}
+                radius = { filterCircleRadius }
                 strokeWidth = { 2 }
                 strokeColor = { 'black' }
                 fillColor = { 'rgba(230,238,255,0.5)' }
-                //onRegionChangeComplete = { this.onRegionChangeComplete.bind(this) }
         />
         </MapView>
         <View style={styles.mapInput}>
