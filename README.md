@@ -12,6 +12,10 @@ BikeAlert is used by bicyclists and drivers. Bicyclists open the app before a ri
   <img src="readmeFiles/bikerInitial.png?raw=true" />
 </p>
 
+<p align="center">
+  Left to Right: Main page, Driver Page, Bicyclist Page
+</p>
+
 ## Features
 
 The app consists of separate driver and bicyclist portions
