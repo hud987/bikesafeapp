@@ -4,25 +4,32 @@
 
 Each year in the US, ~800 cyclists die in automobile accidents. BikeAlert is a phone application to reduce this number by alerting drivers of nearby bicyclists. 
 
-BikeAlert is used by bicyclists and drivers. Bicyclists open the app before a ride and press a button to start sending their location to a database. Drivers use the app like any other map servie. When a bicyclist nears the driver, they can see that bicyclist’s location on their map and receive a notification.
-
 <p align="center">
   <img src="readmeFiles/mainPage.png?raw=true" />
-  <img src="readmeFiles/mapInitial.png?raw=true" />
   <img src="readmeFiles/bikerInitial.png?raw=true" />
+  <img src="readmeFiles/mapInitial.png?raw=true" />
 </p>
 
 <p align="center">
-  Left to Right: Main page, Driver Page, Bicyclist Page
+  Left to Right: Main page, Bicyclist Page, Driver Page
 </p>
 
-## Features
+## Bicyclists
 
-The app consists of separate driver and bicyclist portions
+Bicyclists open the app before a ride and press a button to start sending their location to a database.
+
+### Updating Locations
+
+<p align="center"><img src="readmeFiles/updatingDatabase.gif?raw=true" /></p>
+
+
+## Drivers
+
+Drivers use the app like any other map servie. When a bicyclist nears the driver, they can see that bicyclist’s location on their map and receive a notification.
 
 ### Dyanimc Filter 
 
-<p align="center"><img style={{width: 100}} src="readmeFiles/workingFilterSmall.gif?raw=true" /></p>
+<p align="center"><img src="readmeFiles/workingFilterSmall.gif?raw=true" /></p>
 
 Each driver has a filter to select relevant bicyclists
 
