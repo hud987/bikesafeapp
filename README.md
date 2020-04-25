@@ -18,7 +18,7 @@ Each year in the US, ~800 cyclists die in automobile accidents. BikeAlert is a p
 
 Bicyclists open the app before a ride and press a button to start sending their location to a database.
 
-### * Updating Locations
+* ### Updating Locations
 
 <p align="center"><img src="readmeFiles/updatingDatabase.gif?raw=true" /></p>
 
@@ -26,13 +26,13 @@ Bicyclists open the app before a ride and press a button to start sending their 
 
 Drivers use the app like any other map servie. When a bicyclist nears the driver, they can see that bicyclist’s location on their map and receive a notification.
 
-### * Dyanimc Filter 
+* ### Dyanimc Filter 
 
 <p align="center"><img src="readmeFiles/workingFilterSmall.gif?raw=true" /></p>
 
 Each driver has a filter to select relevant bicyclists
 
-### * Directional Notifications
+* ### Directional Notifications
 
 <p align="center"><img src="readmeFiles/workingNotificationsSmall.gif?raw=true" /></p>
 
