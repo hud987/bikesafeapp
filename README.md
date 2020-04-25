@@ -16,13 +16,13 @@ The app consists of separate driver and bicyclist portions
 
 ### Dyanimc Filter 
 
-<p align="center"><img style={{width: 100}} src="readmeFiles/workingFilter.gif?raw=true" /></p>
+<p align="center"><img style={{width: 100}} src="readmeFiles/workingFilterSmall.gif?raw=true" /></p>
 
 Each driver has a filter to select relevant bicyclists
 
 ### Dyanimc Notifications
 
-<p align="center"><img src="readmeFiles/workingNotifications.gif?raw=true" /></p>
+<p align="center"><img src="readmeFiles/workingNotificationsSmall.gif?raw=true" /></p>
 
 When a bicyclist appears within a driver's filter, they recieve a notification. THis notification show the location of the bicyclists relative to the driver
 
