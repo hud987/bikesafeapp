@@ -16,7 +16,7 @@ The app consists of separate driver and bicyclist portions
 
 ### Dyanimc Filter 
 
-<p align="center"><img src="readmeFiles/workingFilter.gif?raw=true" /></p>
+<p align="center"><img style={{width: 100}} src="readmeFiles/workingFilter.gif?raw=true" /></p>
 
 Each driver has a filter to select relevant bicyclists
 
