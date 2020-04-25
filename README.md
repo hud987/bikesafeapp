@@ -12,6 +12,8 @@ This mobile app increases safety for bikers
 
 <p align="center"><img src="readmeFiles/workingFilter.gif?raw=true" /></p>
 
+<p align="center"><img src="readmeFiles/workingNotifications.gif?raw=true" /></p>
+
 ## Features
 
 The app consists of a menu on the left and router sandbox on the right. 
