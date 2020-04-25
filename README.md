@@ -1,11 +1,11 @@
 # Bike Alert Mobile App
 
-<p align="center"><img src="readmeFiles/appIcon.png?raw=true" /></p>
+<!--<p align="center"><img src="readmeFiles/appIcon.png?raw=true" /></p>-->
 
 Each year in the US, ~800 cyclists die in automobile accidents. BikeAlert is a phone application to reduce this number by alerting drivers of nearby bicyclists. 
 
 <p align="center">
-  <img src="readmeFiles/mainPage.png?raw=true" />
+  <img margin-left=10 src="readmeFiles/mainPage.png?raw=true" />
   <img src="readmeFiles/bikerInitial.png?raw=true" />
   <img src="readmeFiles/mapInitial.png?raw=true" />
 </p>
@@ -22,7 +22,6 @@ Bicyclists open the app before a ride and press a button to start sending their 
 
 <p align="center"><img src="readmeFiles/updatingDatabase.gif?raw=true" /></p>
 
-
 ## Drivers
 
 Drivers use the app like any other map servie. When a bicyclist nears the driver, they can see that bicyclist’s location on their map and receive a notification.
@@ -33,7 +32,7 @@ Drivers use the app like any other map servie. When a bicyclist nears the driver
 
 Each driver has a filter to select relevant bicyclists
 
-### Dyanimc Notifications
+### Directional Notifications
 
 <p align="center"><img src="readmeFiles/workingNotificationsSmall.gif?raw=true" /></p>
 
