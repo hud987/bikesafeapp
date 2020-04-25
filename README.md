@@ -2,8 +2,6 @@
 
 This mobile app increases safety for bikers
 
-[Check out the current version](https://thawing-crag-42208.herokuapp.com/)
-
 <p align="center"><img src="readmeFiles/appIcon.png?raw=true" /></p>
 
 ## Features
