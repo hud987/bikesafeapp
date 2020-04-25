@@ -5,8 +5,8 @@
 This mobile app increases safety for bikers
 
 <p align="center">
-  <img src="readmeFiles/mapInit.png?raw=true" />
   <img src="readmeFiles/mainPage.png?raw=true" />
+  <img src="readmeFiles/mapInitial.png?raw=true" />
   <img src="readmeFiles/bikerStartSending.png?raw=true" />
 </p>
 
