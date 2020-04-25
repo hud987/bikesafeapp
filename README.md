@@ -2,11 +2,9 @@
 
 <p align="center"><img src="readmeFiles/appIcon.png?raw=true" /></p>
 
-Each year in the US, approximately 800 cyclists are killed in automobile accidents. BikeAlert is a phone application to reduce bicycle-automobile collisions by alerting drivers of nearby bicyclists. The app is used by bicyclists and drivers. Bicyclists’ phones send their location to a database and drivers’ phones search the database for relevant entries to show on the map.
+Each year in the US, ~800 cyclists die in automobile accidents. BikeAlert is a phone application to reduce this number by alerting drivers of nearby bicyclists. 
 
-Bicyclists open the app before a ride and press a button to start sending their location. Drivers use the app like any other map application, search for directions or just start driving. When a bicyclist nears the driver, they can see that bicyclist’s location on their map and receive a notification.
-
-
+BikeAlert is used by bicyclists and drivers. Bicyclists open the app before a ride and press a button to start sending their location to a database. Drivers use the app like any other map servie. When a bicyclist nears the driver, they can see that bicyclist’s location on their map and receive a notification.
 
 <p align="center">
   <img src="readmeFiles/mainPage.png?raw=true" />
