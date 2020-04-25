@@ -4,8 +4,8 @@
 
 Each year in the US, ~800 cyclists die in automobile accidents. BikeAlert is a phone application to reduce this number by alerting drivers of nearby bicyclists. 
 
-<p align="center">
-  <img padding-right="100px" src="readmeFiles/mainPage.png?raw=true" />
+<p align="center" display="flex">
+  <img src="readmeFiles/mainPage.png?raw=true" />
   <img src="readmeFiles/bikerInitial.png?raw=true" />
   <img src="readmeFiles/mapInitial.png?raw=true" />
 </p>
