@@ -17,7 +17,7 @@ class BikerOrDriver extends Component {
     title: 'Home',
     headerTintColor: '#ffffff',
     headerStyle: {
-      backgroundColor: '#2F95D6',
+      backgroundColor: '#5cb85c',
     },
 
   };
@@ -28,16 +28,18 @@ class BikerOrDriver extends Component {
         <View style={styles.buttonContainer}>
           <View style={styles.singleButtonContainer}>
           <Button 
-            style={styles.buttonText} 
+            success={true}
+            style={styles.buttonBackground} 
             onPress={() => this.props.navigation.navigate('Biker')}>
-            <Text>Bicyclist</Text>
+            <Text style={styles.buttonText} >Bicyclist</Text>
           </Button> 
           </View>
           <View style={styles.singleButtonContainer}>
           <Button 
-            style={styles.buttonText} 
+            success={true}
+            style={styles.buttonBackground} 
             onPress={() => this.props.navigation.navigate('Driver')}>
-            <Text>Driver</Text>
+            <Text style={styles.buttonText}>Driver</Text>
           </Button> 
           </View>
         </View>
@@ -58,14 +60,20 @@ const styles = StyleSheet.create({
       //backgroundColor: Colors.background
     },
     buttonContainer: {
-      width: 175,
+      //width: 175,
       justifyContent: 'center',
     },
     singleButtonContainer: {
       padding: 15,
     },
-    buttonText: {
+    buttonBackground: {
+      width: 250,
+      height: 100,
       justifyContent: 'center',
-    }
+    },
+    buttonText: {
+      fontSize: 20,
+      color: 'white',
+    },
 });
 

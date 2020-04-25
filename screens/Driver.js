@@ -6,14 +6,17 @@ import {
   ScrollView,
   StyleSheet,
   TextInput,
+  Alert,
 } from "react-native";
 import { Button } from 'native-base';
 import MapView, { Marker, PROVIDER_GOOGLE } from 'react-native-maps';
 import RNLocation from 'react-native-location';
+import AsyncStorage from '@react-native-community/async-storage';
 
 import Polyline from '@mapbox/polyline'
 import firebase from '../database/firebaseDb'
 import { GeoFirestore } from 'geofirestore';
+import {Notifications} from 'react-native-notifications';
 
 export default class BikerOrDriver extends React.Component {
   state = {
@@ -21,35 +24,49 @@ export default class BikerOrDriver extends React.Component {
     lat: 40.4241, //null, 
     lng: -86.9217, //null,
     speed: 0,
-    heading: 0,
+    course: -1,
+    lastCourseGreaterThanNegOne: null,
     error: null,
     desLat: 37.885874,
     desLng: -122.506447,
     desPlace_Id: null,
     destination: "",
     predictions: [],
-    markers: [],
+    //markers: [],
     directionLine: null,
   }
 
   componentWillUnmount() {
+    /*const saveMapOpen = async () => {
+      try {
+        await AsyncStorage.setItem('mapOpen', false);
+      } catch (error) {
+        console.log(error.message);
+      }
+      console.log('set map open to false document id')
+    };*/
+    this.mapOpen = false;
+    console.log('map open: ' + this.mapOpen)
     if (this.locationSubscription) {
       this.locationSubscription();
     }
   }
 
-  componentDidMount() {
-    let geoOptions = {
-      enableHighAccuracy: true,
-      timeout: 10000,
-      maxAge: 60*60
-    }
-    var currLat
-    var currLng
-    this.setState({ready: false, error: null})
+  componentDidMount() {  
+    /*const saveMapOpen = async () => {
+      try {
+        await AsyncStorage.setItem('mapOpen', true);
+      } catch (error) {
+        console.log(error.message);
+      }
+      console.log('set map open to true')
+    };
+    saveMapOpen()  */
+    this.mapOpen = true
+    console.log('map open: ' + this.mapOpen)
     
     RNLocation.configure({
-      distanceFilter: 0
+      distanceFilter: 1
     })
     RNLocation.checkPermission({
       ios: 'whenInUse', // or 'always'
@@ -78,12 +95,18 @@ export default class BikerOrDriver extends React.Component {
     this.locationSubscription = RNLocation.subscribeToLocationUpdates(locations => {
       var currLat = locations[0].latitude
       var currLng = locations[0].longitude
+      var courseIfCourseGreaterThanNegOne = null
       console.log('course: ' + locations[0].course )
       console.log('speed: ' + locations[0].speed )
+      //console.log('last course > -1: ' + this.state.lastCourseGreaterThanNegOne )
+      if (locations[0].course>-1) {
+        courseIfCourseGreaterThanNegOne = locations[0].course
+      }
       this.getBicyclistsWithinRadius(currLat,currLng)
       this.setState({
         speed: locations[0].speed,
         course: locations[0].course,
+        lastCourseGreaterThanNegOne: courseIfCourseGreaterThanNegOne,
         lat: locations[0].latitude,
         lng: locations[0].longitude
       }, )
@@ -110,23 +133,94 @@ export default class BikerOrDriver extends React.Component {
     
     query.onSnapshot((value) => {
       var pulledMarkers = [];
+      var pulledMarkersLatLng = [];
+      var pulledMarkerIds = [];
+      console.log(value.size)
       value.forEach((e,i) => {
+        //console.log('marker data: ' + e.id)
         const lat = e.data().coordinates.U;
         const lng = e.data().coordinates.k;
+        pulledMarkersLatLng.push([lat,lng])
+        pulledMarkerIds.push(e.id)
         pulledMarkers.push(
           <Marker
-            key={(i).toString()}
+            key={e.id}
             coordinate = {{
               latitude: lat, 
               longitude: lng
             }}
-            pinColor = {"orange"}
+            pinColor = {"green"}
           />
         )
       })
-      console.log('onSnapshot')
-      this.setState({markers: pulledMarkers})
+      
+      if (this.state.markers && pulledMarkers.length > this.state.markers.length && this.mapOpen) {
+        var stateMarkerIdsSet = new Set()
+        this.state.markerIds.forEach((e,i) => {
+          stateMarkerIdsSet.add(e)
+        })
+
+        for (var i=0;i<pulledMarkers.length;i++){
+          if (!stateMarkerIdsSet.has(pulledMarkerIds[i])) {
+            console.log('!--- notification ---!')
+            newBikerLat = pulledMarkersLatLng[i][0]
+            newBikerLng = pulledMarkersLatLng[i][1]
+
+            if (this.state.lastCourseGreaterThanNegOne==null) {
+              Notifications.postLocalNotification({
+                body: "A Biker has appeared nearby",
+                title: "Biker nearby",
+                sound: "chime.aiff",
+                  silent: false,
+                category: "SOME_CATEGORY",
+                userInfo: { }
+              });
+            } else {
+              var angleOfNewBiker = this.findAngle(forwardLng,forwardLat,currLng,currLat,newBikerLng,newBikerLat)
+
+              var newBikerDirectionText
+              if (angleOfNewBiker<45 || angleOfNewBiker>=315) {
+                newBikerDirectionText = 'in front of you'
+              } else if (angleOfNewBiker>=45 && angleOfNewBiker<135) {
+                newBikerDirectionText = 'to your left'
+              } else if (angleOfNewBiker>=135 && angleOfNewBiker<225) {
+                newBikerDirectionText = 'behind you'
+              } else {
+                newBikerDirectionText = 'to your right'
+              }
+              
+              //console.log('angle of new biker:' + angleOfNewBiker)
+              //console.log('new biker lat, lng:' + newBikerLat + ' , '+ newBikerLng)
+              //console.log('curr lat, lng:' + currLat + ' , ' + currLng)
+              //console.log('foward point lat, lng:' + forwardLat + ' , ' + forwardLng)
+              Notifications.postLocalNotification({
+                body: "A biker has appeared " + newBikerDirectionText,
+                title: "Biker " + newBikerDirectionText,
+                sound: "chime.aiff",
+                  silent: false,
+                category: "SOME_CATEGORY",
+                userInfo: { }
+              });
+            }
+          }
+        }
+      } 
+      this.setState({
+        markers: pulledMarkers,
+        markerIds: pulledMarkerIds,
+      })
     });
+  }
+  
+  findAngle = (Ax,Ay,Bx,By,Cx,Cy) =>{
+    var AB = Math.sqrt(Math.pow(Bx-Ax,2)+ Math.pow(By-Ay,2));    
+    var BC = Math.sqrt(Math.pow(Bx-Cx,2)+ Math.pow(By-Cy,2)); 
+    var AC = Math.sqrt(Math.pow(Cx-Ax,2)+ Math.pow(Cy-Ay,2));
+    return Math.acos((BC*BC+AB*AB-AC*AC)/(2*BC*AB)) * 180 / Math.PI;
+}
+
+  handlePerm(perms) {
+    Alert.alert("Permissions", JSON.stringify(perms));
   }
 
   geoSuccess = (position) => {
@@ -145,6 +239,7 @@ export default class BikerOrDriver extends React.Component {
   }
 
   async getDirections() {
+
     console.log('get directions')
     if (this.state.desPlace_Id==null || this.state.destination=='') {
       this.setState({ directionLine: null })
@@ -217,7 +312,6 @@ export default class BikerOrDriver extends React.Component {
     //course is between 1-360, 0 is straight up
     var forwardLat = this.state.lat //37.33180957
     var forwardLng = this.state.lng //-122.03053391
-    var angle
     var filterCircleRadius = 35
     var filterCircleCenter = {latitude: this.state.lat, longitude: this.state.lng}
     if (this.state.speed > 0 && this.state.course > -1) {
@@ -227,7 +321,6 @@ export default class BikerOrDriver extends React.Component {
       forwardLng = this.state.lng + this.state.speed * .00004 * Math.sin(this.state.course * 3.14/180.0)
       filterCircleCenter = {latitude: forwardLat, longitude: forwardLng}
     }
-    console.log(filterCircleRadius)
 
     const predictions = this.state.predictions.map(prediction => {
       if (this.state.destination != prediction.description) {
@@ -277,9 +370,10 @@ export default class BikerOrDriver extends React.Component {
           <TextInput style={styles.destinationInput}placeholder="Enter destination..." value={this.state.destination} onChangeText={destination => this.onChangeDestination(destination)} />
           <Button 
             full
+            success={true}
             style={styles.directionsButton} 
             onPress={() => this.getDirections()}>
-            <Text>-></Text>
+            <Text style={{color: 'white'}}>-></Text>
           </Button> 
         </View>
         {predictions}

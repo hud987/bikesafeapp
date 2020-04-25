@@ -8,6 +8,7 @@ import {
 } from "react-native";
 import {Button} from 'native-base';
 import RNLocation from 'react-native-location';
+import AsyncStorage from '@react-native-community/async-storage';
 
 import firebase from '../database/firebaseDb'
 import { GeoFirestore } from 'geofirestore';
@@ -36,8 +37,28 @@ export default class Biker extends React.Component {
   }
 
   componentDidMount() {
-    //getLocations(onLocationsReceived);
-
+    const removeItemValue = async () => {
+      try {
+          await AsyncStorage.removeItem('documentId');
+          return true;
+      }
+      catch(exception) {
+          return false;
+      }
+    }
+    const getDocumentId = async () => {
+      let documentId = '';
+      try {
+        documentId = await AsyncStorage.getItem('documentId') || null;
+        console.log('state document id: ' + this.state.documentId)
+        console.log('document id: ' + documentId)
+        console.log('doc id in api'+documentId)
+        this.setState({documentId: documentId})
+      } catch (error) {
+        console.log(error.message);
+      }
+    }
+    getDocumentId()
     let geoOptions = {
       enableHighAccuracy: true,
       timeout: 10000,
@@ -81,7 +102,7 @@ export default class Biker extends React.Component {
         lat: locations[0].latitude,
         lng: locations[0].longitude
       }, )//this.mergeCoords)
-
+      console.log('doc id in location sub'+this.state.documentId)
       var firebaseRef = firebase.firestore();
       const geofirestore = new GeoFirestore(firebaseRef);
       const geocollection = geofirestore.collection('Locations');
@@ -116,6 +137,15 @@ export default class Biker extends React.Component {
             coordinates: new firebase.firestore.GeoPoint(this.state.lat, this.state.lng)
           }).then((res) => {
             console.log('sent data to '+res.id);
+            const saveDocumentId = async () => {
+              try {
+                await AsyncStorage.setItem('documentId', res.id);
+              } catch (error) {
+                console.log(error.message);
+              }
+              console.log('logged document id')
+            };
+            saveDocumentId()
             this.setState({documentId: res.id});
           })
         } 
@@ -135,10 +165,11 @@ export default class Biker extends React.Component {
         <View style={styles.screen}>
           <Button
             full
-            success={this.state.sendingLocation} 
-            style={styles.buttonText} 
+            success={!this.state.sendingLocation}
+            danger={this.state.sendingLocation} 
+            style={styles.buttonBackground} 
             onPress={() => this.onSendLocation()}>
-            <Text>{ this.state.buttonText }</Text>
+            <Text style={styles.buttonText}>{ this.state.buttonText }</Text>
           </Button> 
         </View>
     );
@@ -151,13 +182,15 @@ const styles = StyleSheet.create({
       backgroundColor: 'white',
       justifyContent: "center",
     },
-    buttonText: {
+    buttonBackground: {
       marginBottom: 90,
-      height: 70,
+      width: 250,
+      height: 100,
       marginHorizontal: '20%',
       justifyContent: 'center',
     },
-    geoText: {
-      textAlign: 'center',
-    }
+    buttonText: {
+      fontSize: 20,
+      color: 'white',
+    },
 });
