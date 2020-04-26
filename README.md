@@ -24,6 +24,8 @@ Each year in the US, ~800 cyclists die in automobile accidents. These collisions
 
 Bicyclists open the app before a ride and press a button to start sending their location to a database.
 
+<p align="center"><img src="readmeFiles/startSending.gif?raw=true" /></p>
+
 * ### Updating Locations
 
 <p align="center"><img src="readmeFiles/updatingDatabase.gif?raw=true" /></p>
