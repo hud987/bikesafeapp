@@ -30,9 +30,17 @@ Bicyclists open the app before a ride and press a button to start sending their 
 
 <p align="center"><img src="readmeFiles/updatingDatabase.gif?raw=true" /></p>
 
+As a bicyclist moves, their location updates in real time
+
 ## Driver Features
 
 Drivers use the app like any other map servie. When a bicyclist nears the driver, they can see that bicyclist’s location on their map and receive a notification.
+
+* ### Directions  
+
+Drivers can search for locations and get directions with Google api.
+
+<p align="center"><img src="readmeFiles/mapDirectionsCrop.gif?raw=true" /></p>
 
 * ### Dyanimc Filter 
 
