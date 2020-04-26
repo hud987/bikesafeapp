@@ -40,7 +40,7 @@ Drivers use the app like any other map servie. When a bicyclist nears the driver
 
 Drivers can search for locations and get directions with Google api.
 
-<p align="center"><img src="readmeFiles/mapDirectionsCrop.gif?raw=true" /></p>
+<p align="center"><img src="readmeFiles/mapDirectionsCrop.png?raw=true" /></p>
 
 * ### Dyanimc Filter 
 
