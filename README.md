@@ -24,13 +24,13 @@ Each year in the US, ~800 cyclists die in automobile accidents. These collisions
 
 Bicyclists open the app before a ride and press a button to start sending their location to a database.
 
-<p align="center"><img src="readmeFiles/startSend.gif?raw=true" /></p>
+<!--<p align="center"><img src="readmeFiles/startSend.gif?raw=true" /></p>-->
 
 * ### Updating Locations
 
 <p align="center"><img src="readmeFiles/updatingDatabase.gif?raw=true" /></p>
 
-As a bicyclist moves, their location updates in real time
+As a bicyclist moves, their location updates in real time in the Firebase database.
 
 ## Driver Features
 
@@ -38,19 +38,22 @@ Drivers use the app like any other map servie. When a bicyclist nears the driver
 
 * ### Directions  
 
-Drivers can search for locations and get directions with Google api.
-
 <p align="center"><img src="readmeFiles/mapDirectionsCrop.png?raw=true" /></p>
+
+Drivers can search for locations and get directions with Google api.
 
 * ### Dyanimc Filter 
 
 <p align="center"><img src="readmeFiles/workingFilterSmall.gif?raw=true" /></p>
 
-Each driver has a filter to select relevant bicyclists
+Each driver has a filter to select relevant bicyclists. The filter updates with driver speed and heading.
 
 * ### Directional Notifications
 
 <p align="center"><img src="readmeFiles/workingNotificationsSmall.gif?raw=true" /></p>
 
-When a bicyclist appears within a driver's filter, they recieve a notification. THis notification show the location of the bicyclists relative to the driver
+When a bicyclist appears within a driver's filter, they recieve a notification. This notification show the location of the bicyclists relative to the driver
 
+## Notes
+
+This project was created as part of Purdue's professional master progam
