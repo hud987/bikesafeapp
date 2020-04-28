@@ -20,9 +20,9 @@ Each year in the US, ~800 cyclists die in automobile accidents. These collisions
   Left to Right: Main page, Bicyclist Page, Driver Page
 </p>
 
-## Bicyclist Features
+## Used by Bicyclist
 
-Bicyclists open the app before a ride and press a button to start sending their location to a database.
+Bicyclists open the app before a ride and press a button to start sending their location to the Firebase database.
 
 <!--<p align="center"><img src="readmeFiles/startSend.gif?raw=true" /></p>-->
 
@@ -30,29 +30,29 @@ Bicyclists open the app before a ride and press a button to start sending their 
 
 <p align="center"><img src="readmeFiles/updatingDatabase.gif?raw=true" /></p>
 
-As a bicyclist moves, their location updates in real time in the Firebase database.
+As the bicyclist moves, the Firebase database updates their location in real time.
 
-## Driver Features
+## Used by Driver
 
-Drivers use the app like any other map servie. When a bicyclist nears the driver, they can see that bicyclist’s location on their map and receive a notification.
+Drivers use the app like any other map service, seeing their location and getting directions. BikeAlert's differences appear when a bicyclist nears the driver. Drivers can see that bicyclist’s location on their map and receive a notification of the bicyclist's direction.
 
 * ### Directions  
 
 <p align="center"><img src="readmeFiles/mapDirectionsCrop.png?raw=true" /></p>
 
-Drivers can search for locations and get directions with Google api.
+Drivers can search for locations and get directions from Google api.
 
 * ### Dyanimc Filter 
 
 <p align="center"><img src="readmeFiles/workingFilterSmall.gif?raw=true" /></p>
 
-Each driver has a filter to select relevant bicyclists. The filter updates with driver speed and heading.
+Each driver has an individualized filter to select relevant bicyclists, updating with the driver's speed and heading.
 
 * ### Directional Notifications
 
 <p align="center"><img src="readmeFiles/workingNotificationsSmall.gif?raw=true" /></p>
 
-When a bicyclist appears within a driver's filter, they recieve a notification. This notification show the location of the bicyclists relative to the driver
+When a bicyclist appears within the driver's filter, they recieve a notification showing the direction of the bicyclists relative to the driver
 
 ## Notes
 
