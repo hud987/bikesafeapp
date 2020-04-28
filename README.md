@@ -1,12 +1,12 @@
-# Bike Alert Mobile App
+# Bike Alert Mobile App <img src="readmeFiles/appIcon.png?raw=true" />
 
 BikeAlert is a mobile app to alert drivers of nearby bicyclists. The app can be used by both bicyclists and drivers. Bicyclists send their location to a database during a ride and drivers see relevant bicyclists on their map. 
 
-<!--<p align="center"><img src="readmeFiles/appIcon.png?raw=true" /></p>-->
+<!--<p align="center"></p>-->
 
 ## Motiviation
 
-Each year in the US, ~800 cyclists die in automobile accidents. These collisions could be reduced if automobile drivers were more aware of nearby bicyclists. Since most bicyclists carry their phones during rides, a phone app could increase safety.
+Each year in the US, ~800 cyclists die in automobile accidents. This number could be reduced if automobile drivers were more aware of nearby bicyclists. Since most bicyclists carry their phones during rides, a phone app could increase safety.
 
 ## Screenshots
 
@@ -17,7 +17,7 @@ Each year in the US, ~800 cyclists die in automobile accidents. These collisions
 </p>
 
 <p align="center">
-  Left to Right: Main page, Bicyclist Page, Driver Page
+  Left to Right: Home page, Bicyclist Page, Driver Page
 </p>
 
 ## Used by Bicyclist
