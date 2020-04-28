@@ -1,8 +1,8 @@
+<p align="center"><img src="readmeFiles/appIcon.png?raw=true" /></p>
+
 # Bike Alert Mobile App
 
 BikeAlert is a mobile app to alert drivers of nearby bicyclists. The app can be used by both bicyclists and drivers. Bicyclists send their location to a database during a ride and drivers see relevant bicyclists on their map. 
-
-<!--<p align="center"><img src="readmeFiles/appIcon.png?raw=true" /></p>-->
 
 ## Motiviation
 
