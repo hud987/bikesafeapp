@@ -42,7 +42,7 @@ Drivers use the app like any other map service, seeing their location and gettin
 
 Drivers can search for locations and get directions from Google api.
 
-* ### Dyanimc Filter 
+* ### Dynamic Filter 
 
 <p align="center"><img src="readmeFiles/workingFilterSmall.gif?raw=true" /></p>
 
