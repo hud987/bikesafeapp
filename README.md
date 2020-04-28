@@ -20,7 +20,7 @@ Each year in the US, ~800 cyclists die in automobile accidents. This number coul
   Left to Right: Home page, Bicyclist Page, Driver Page
 </p>
 
-## Used by Bicyclist
+## Used by Bicyclists
 
 Bicyclists open the app before a ride and press a button to start sending their location to the Firebase database.
 
@@ -32,7 +32,7 @@ Bicyclists open the app before a ride and press a button to start sending their 
 
 As the bicyclist moves, the Firebase database updates their location in real time.
 
-## Used by Driver
+## Used by Drivers
 
 Drivers use the app like any other map service, seeing their location and getting directions. BikeAlert's differences appear when a bicyclist nears the driver. Drivers can see that bicyclist’s location on their map and receive a notification of the bicyclist's direction.
 
