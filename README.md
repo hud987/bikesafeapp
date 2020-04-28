@@ -52,7 +52,7 @@ Each driver has an individualized filter to select relevant bicyclists, updating
 
 <p align="center"><img src="readmeFiles/workingNotificationsSmall.gif?raw=true" /></p>
 
-When a bicyclist appears within the driver's filter, they recieve a notification showing the direction of the bicyclists relative to the driver
+When a bicyclist appears within the driver's filter, they recieve a notification showing the direction of the bicyclists relative to the driver. Depending on a driver's settings, notifications offer an audio warning and appear when the app is closed.
 
 ## Notes
 
