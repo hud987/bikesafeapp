@@ -40,7 +40,7 @@ Drivers use the app like any other map service, seeing their location and gettin
 
 <p align="center"><img src="readmeFiles/mapDirectionsCrop.png?raw=true" /></p>
 
-Drivers can search for locations and get directions from Google api.
+Drivers can search for locations and receive directions using Google api.
 
 * ### Dynamic Filter 
 
